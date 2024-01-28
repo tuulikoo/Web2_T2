@@ -1,8 +1,8 @@
 /* eslint-disable node/no-unpublished-import */
 import request from 'supertest';
 import expect from 'expect';
-import {User, UserTest} from '../src/interfaces/User';
-import ErrorResponse from '../src/interfaces/ErrorResponse';
+import {User, UserTest} from '../src/types/DBTypes';
+import {ErrorResponse} from '../src/types/MessageTypes';
 
 interface UserWithToken {
   user: User;

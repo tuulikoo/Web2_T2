@@ -7,24 +7,18 @@ import {
   userPost,
   userPutCurrent,
 } from '../controllers/userController';
-import passport from '../../passport';
+import {authenticate} from '../../middlewares';
 
 const router = express.Router();
-
-// TODO: add validation
 
 router
   .route('/')
   .get(userListGet)
   .post(userPost)
-  .put(passport.authenticate('jwt', {session: false}), userPutCurrent)
-  .delete(passport.authenticate('jwt', {session: false}), userDeleteCurrent);
+  .put(authenticate, userPutCurrent)
+  .delete(authenticate, userDeleteCurrent);
 
-router.get(
-  '/token',
-  passport.authenticate('jwt', {session: false}),
-  checkToken
-);
+router.get('/token', authenticate, checkToken);
 
 router.route('/:id').get(userGet);
 

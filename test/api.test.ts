@@ -9,7 +9,7 @@ import {
   postUser,
   putUser,
 } from './userFunctions';
-import {User, UserTest} from '../src/interfaces/User';
+import {User, UserTest} from '../src/types/DBTypes';
 import mongoose from 'mongoose';
 import {getNotFound} from './testFunctions';
 import {
@@ -25,7 +25,6 @@ import {
 } from './catFunctions';
 
 import randomstring from 'randomstring';
-import {catGetByUser} from '../src/api/controllers/catController';
 
 interface UserWithToken {
   user: User;

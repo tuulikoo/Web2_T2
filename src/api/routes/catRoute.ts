@@ -12,8 +12,7 @@ import {
 } from '../controllers/catController';
 import multer, {FileFilterCallback} from 'multer';
 import {body, param, query} from 'express-validator';
-import passport from '../../passport';
-import {getCoordinates, makeThumbnail} from '../../middlewares';
+import {authenticate, getCoordinates, makeThumbnail} from '../../middlewares';
 
 const fileFilter = (
   request: Request,
@@ -29,38 +28,39 @@ const fileFilter = (
 const upload = multer({dest: './uploads/', fileFilter});
 const router = express.Router();
 
-// TODO: add validation
-
 router
   .route('/')
   .get(catListGet)
   .post(
-    passport.authenticate('jwt', {session: false}),
+    authenticate,
     upload.single('cat'),
     makeThumbnail,
     getCoordinates,
+    body('cat_name').notEmpty().escape(),
+    body('birthdate').isDate(),
+    body('weight').isNumeric(),
     catPost
   );
 
-router.route('/area').get(catGetByBoundingBox);
-
 router
-  .route('/user')
-  .get(passport.authenticate('jwt', {session: false}), catGetByUser);
+  .route('/area')
+  .get(
+    query('topRight').notEmpty(),
+    query('bottomLeft').notEmpty(),
+    catGetByBoundingBox
+  );
+
+router.route('/user').get(authenticate, catGetByUser);
 
 router
   .route('/admin/:id')
-  .put(passport.authenticate('jwt', {session: false}), catPutAdmin)
-  .delete(passport.authenticate('jwt', {session: false}), catDeleteAdmin);
+  .put(authenticate, catPutAdmin)
+  .delete(authenticate, catDeleteAdmin);
 
 router
   .route('/:id')
   .get(param('id'), catGet)
-  .put(passport.authenticate('jwt', {session: false}), param('id'), catPut)
-  .delete(
-    passport.authenticate('jwt', {session: false}),
-    param('id'),
-    catDelete
-  );
+  .put(authenticate, param('id'), catPut)
+  .delete(authenticate, param('id'), catDelete);
 
 export default router;

@@ -1,9 +1,8 @@
 /* eslint-disable node/no-unpublished-import */
 import request from 'supertest';
 import expect from 'expect';
-import {Cat} from '../src/interfaces/Cat';
-import DBMessageResponse from '../src/interfaces/DBMessageResponse';
-import {Types} from 'mongoose';
+import {Cat} from '../src/types/DBTypes';
+import {MessageResponse} from '../src/types/MessageTypes';
 
 const getCat = (url: string | Function): Promise<Cat[]> => {
   return new Promise((resolve, reject) => {
@@ -53,7 +52,7 @@ const postCat = (
   url: string | Function,
   token: string,
   pic: string
-): Promise<DBMessageResponse> => {
+): Promise<MessageResponse & {data: Cat}> => {
   return new Promise((resolve, reject) => {
     request(url)
       .post('/api/v1/cats/')
@@ -67,7 +66,7 @@ const postCat = (
         if (err) {
           reject(err);
         } else {
-          const cat: DBMessageResponse = response.body;
+          const cat: MessageResponse & {data: Cat} = response.body;
           expect(cat.data._id).not.toBe('');
           expect(cat.message).not.toBe('');
           resolve(response.body);
@@ -81,7 +80,7 @@ const adminPutCat = (
   url: string | Function,
   token: string,
   id: string
-): Promise<DBMessageResponse> => {
+): Promise<MessageResponse & {data: Cat}> => {
   return new Promise((resolve, reject) => {
     const newName = 'Admin Test Cat ' + new Date().toISOString();
     request(url)
@@ -95,7 +94,7 @@ const adminPutCat = (
         if (err) {
           reject(err);
         } else {
-          const cat: DBMessageResponse = response.body;
+          const cat: MessageResponse & {data: Cat} = response.body;
           expect((cat.data as Cat).cat_name).toBe(newName);
           expect(cat.message).not.toBe('');
           resolve(cat);
@@ -109,7 +108,7 @@ const userPutCat = (
   url: string | Function,
   token: string,
   id: string
-): Promise<DBMessageResponse> => {
+): Promise<MessageResponse & {data: Cat}> => {
   return new Promise((resolve, reject) => {
     const newName = 'Test Cat ' + new Date().toISOString();
     request(url)
@@ -123,7 +122,7 @@ const userPutCat = (
         if (err) {
           reject(err);
         } else {
-          const cat: DBMessageResponse = response.body;
+          const cat: MessageResponse & {data: Cat} = response.body;
           expect(cat.message).not.toBe('');
           expect((cat.data as Cat).cat_name).toBe(newName);
           resolve(cat);
@@ -137,7 +136,7 @@ const adminDeleteCat = (
   url: string | Function,
   token: string,
   id: string
-): Promise<DBMessageResponse> => {
+): Promise<MessageResponse & {data: Cat}> => {
   return new Promise((resolve, reject) => {
     request(url)
       .delete('/api/v1/cats/admin/' + id)
@@ -147,7 +146,7 @@ const adminDeleteCat = (
         if (err) {
           reject(err);
         } else {
-          const cat: DBMessageResponse = response.body;
+          const cat: MessageResponse & {data: Cat} = response.body;
           expect(cat.message).not.toBe('');
           expect(cat.data._id).toBe(id);
           resolve(cat);
@@ -161,7 +160,7 @@ const userDeleteCat = (
   url: string | Function,
   token: string,
   id: string
-): Promise<DBMessageResponse> => {
+): Promise<MessageResponse & {data: Cat}> => {
   return new Promise((resolve, reject) => {
     request(url)
       .delete('/api/v1/cats/' + id)
@@ -171,7 +170,7 @@ const userDeleteCat = (
         if (err) {
           reject(err);
         } else {
-          const cat: DBMessageResponse = response.body;
+          const cat: MessageResponse & {data: Cat} = response.body;
           expect(cat.message).not.toBe('');
           expect(cat.data._id).toBe(id);
           resolve(cat);

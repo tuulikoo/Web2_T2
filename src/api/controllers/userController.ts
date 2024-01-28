@@ -4,4 +4,4 @@
 // - userPost - create new user. Remember to hash password
 // - userPutCurrent - update current user
 // - userDeleteCurrent - delete current user
-// - checkToken - check if current user token is valid: return data from req.user. No need for database query
+// - checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
