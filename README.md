@@ -14,7 +14,9 @@ Convert the REST API from last weeks assignment to use MongoDB and Mongoose
 
 - Your task is to complete all TODOs in the code until all tests are passed
 
-## Create types/interfaces based on these objects:
+## Database
+
+- Create the Schemas based on the JSON examples below
 
 Cat:
 
@@ -52,10 +54,6 @@ User:
 }
 ```
 
-## Database
-
-- Create the Schemas based on the intefaces/types above
-
 ## Routes
 
 - /auth
@@ -66,4 +64,4 @@ User:
 
 - login users email as username
 - create admin manually to user collection: admin@metropolia.fi, password: 1234
-- Always empty your cats after tests.
+- Always empty your cats after tests, so that you dont have user_ids that are not in users collection
