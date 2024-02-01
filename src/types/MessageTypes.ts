@@ -17,7 +17,7 @@ type UploadResponse = MessageResponse & {
   id: number;
 };
 type PostMessageUser = MessageResponse & {
-  user: UserOutput;
+  data: UserOutput;
 };
 type PostMessage = MessageResponse & {
   _id: number;

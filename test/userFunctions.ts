@@ -66,9 +66,11 @@ const postUser = (
         } else {
           expect(response.body).toHaveProperty('message');
           expect(response.body).toHaveProperty('data');
+          console.log('response.body.data in test', response.body.data);
           expect(response.body.data).not.toHaveProperty('password');
           expect(response.body.data).not.toHaveProperty('role');
           resolve(response.body);
+          console.log('response.body in test', response.body);
         }
       });
   });
