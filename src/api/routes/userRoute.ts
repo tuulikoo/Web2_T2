@@ -1,4 +1,5 @@
 import express from 'express';
+import {authenticate} from '../../middlewares';
 import {
   checkToken,
   userDeleteCurrent,
@@ -7,7 +8,6 @@ import {
   userPost,
   userPutCurrent,
 } from '../controllers/userController';
-import {authenticate} from '../../middlewares';
 
 const router = express.Router();
 

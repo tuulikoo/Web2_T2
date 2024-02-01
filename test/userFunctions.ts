@@ -1,3 +1,4 @@
+//test user functions
 /* eslint-disable node/no-unpublished-import */
 import request from 'supertest';
 import expect from 'expect';

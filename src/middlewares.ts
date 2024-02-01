@@ -98,14 +98,18 @@ const authenticate = async (
 ) => {
   try {
     const bearer = req.headers.authorization;
+    console.log('Authorization Header:', bearer);
     if (!bearer) {
+      console.log('No token provided');
       next(new CustomError('No token provided', 401));
       return;
     }
 
     const token = bearer.split(' ')[1];
+    console.log('Extracted Token:', token);
 
     if (!token) {
+      console.log('Nooo token provided');
       next(new CustomError('No token provided', 401));
       return;
     }
@@ -128,6 +132,7 @@ const authenticate = async (
 
     next();
   } catch (error) {
+    console.error('Authenticationnn Error:', (error as Error).message);
     next(new CustomError((error as Error).message, 400));
   }
 };
