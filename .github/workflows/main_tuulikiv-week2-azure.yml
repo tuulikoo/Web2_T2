@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -61,6 +61,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'tuulikiv-week2-azure'
-          slot-name: 'Production'
+          slot-name: 'production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9BC35799697D42339A7C43550D2440AA }}
           package: .
