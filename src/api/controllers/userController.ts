@@ -8,7 +8,7 @@
 // - checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
 
 import {Request, Response, NextFunction} from 'express';
-import {User, UserInput, UserOutput} from '../../types/DBTypes';
+import {UserInput, UserOutput} from '../../types/DBTypes';
 import UserModel from '../models/userModel';
 import CustomError from '../../classes/CustomError';
 import {MessageResponse, PostMessageUser} from '../../types/MessageTypes';
@@ -16,7 +16,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const checkToken = async (
-  req: Request<{token: string}>,
+  req: Request,
   res: Response<UserOutput>,
   next: NextFunction
 ) => {
@@ -40,18 +40,9 @@ const checkToken = async (
     const decodedToken = jwt.verify(
       token,
       process.env.JWT_SECRET
-    ) as Partial<UserOutput>;
+    ) as UserOutput;
 
-    // Ensure only necessary fields are included in the response
-    const userOutput: UserOutput = {
-      _id: decodedToken._id || '',
-      user_name: decodedToken.user_name || '',
-      email: decodedToken.email || '',
-    };
-
-    console.log('Decoded Token:', userOutput);
-
-    res.locals.user = userOutput;
+    res.locals.user = decodedToken;
 
     next();
   } catch (error) {
@@ -67,14 +58,8 @@ const userListGet = async (
   next: NextFunction
 ) => {
   try {
-    const users = await UserModel.find().select('_id user_name email');
-    const transformedUsers: UserOutput[] = users.map((user) => ({
-      _id: user._id,
-      user_name: user.user_name,
-      email: user.email,
-    }));
-
-    res.json(transformedUsers);
+    const users = await UserModel.find();
+    res.json(users);
   } catch (error) {
     next(error);
   }
@@ -86,18 +71,8 @@ const userGet = async (
   next: NextFunction
 ) => {
   try {
-    const user = await UserModel.findById(req.params.id);
-
-    if (!user) {
-      throw new CustomError('User not found', 404);
-    }
-    const response: Pick<User, '_id' | 'user_name' | 'email'> = {
-      _id: user._id,
-      user_name: user.user_name,
-      email: user.email,
-    };
-
-    res.json(response);
+    // User information is already available in res.locals.user
+    res.json(res.locals.user);
   } catch (error) {
     next(error);
   }
@@ -133,7 +108,7 @@ const userPost = async (
 //checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
 const userPutCurrent = async (
   req: Request<{}, {}, Partial<UserInput>>,
-  res: Response<PostMessageUser>,
+  res: Response<UserOutput>,
   next: NextFunction
 ) => {
   try {
@@ -143,22 +118,10 @@ const userPutCurrent = async (
       req.body,
       {new: true}
     );
-
     if (!user) {
       throw new CustomError('User not found', 404);
     }
-
-    // Construct the data object with _id, user_name, and email
-    const data = {
-      _id: user._id,
-      user_name: user.user_name,
-      email: user.email,
-    };
-
-    res.status(200).json({
-      message: 'User updated',
-      data: data,
-    });
+    res.json(user);
   } catch (error) {
     next(error);
   }
