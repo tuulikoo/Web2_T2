@@ -112,8 +112,10 @@ const getCurrentUser = (
       .set('Authorization', 'Bearer ' + token)
       .expect(200, (err, response) => {
         if (err) {
+          console.log('token in test', token);
           reject(err);
         } else {
+          console.log('token in test', token);
           const user = response.body;
           expect(user).toHaveProperty('_id');
           expect(user).toHaveProperty('user_name');

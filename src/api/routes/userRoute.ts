@@ -11,14 +11,14 @@ import {
 
 const router = express.Router();
 
+router.get('/check-token', authenticate, checkToken); // Change the route path to /check-token
+
 router
   .route('/')
   .get(userListGet)
   .post(userPost)
   .put(authenticate, userPutCurrent)
   .delete(authenticate, userDeleteCurrent);
-
-router.get('/token', authenticate, checkToken);
 
 router.route('/:id').get(userGet);
 
