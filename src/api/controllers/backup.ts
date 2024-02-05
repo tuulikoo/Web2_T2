@@ -11,11 +11,7 @@ import {Request, Response, NextFunction} from 'express';
 import {User, UserInput, UserOutput} from '../../types/DBTypes';
 import UserModel from '../models/userModel';
 import CustomError from '../../classes/CustomError';
-import {
-  MessageResponse,
-  PostMessageUser,
-  UpdateMessageResponse,
-} from '../../types/MessageTypes';
+import {MessageResponse, PostMessageUser} from '../../types/MessageTypes';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -56,7 +52,6 @@ const checkToken = async (
     console.log('Decoded Token:', userOutput);
 
     res.locals.user = userOutput;
-    res.json(userOutput);
 
     next();
   } catch (error) {
@@ -91,7 +86,6 @@ const userGet = async (
   next: NextFunction
 ) => {
   try {
-    console.log('tultiin userGetiin');
     const user = await UserModel.findById(req.params.id);
 
     if (!user) {
@@ -108,20 +102,6 @@ const userGet = async (
     next(error);
   }
 };
-
-//old userGet that functions with checkToken:
-/**const userGet = async (
-  req: Request<{id: string}>,
-  res: Response<UserOutput>,
-  next: NextFunction
-) => {
-  try {
-    // User information is already available in res.locals.user
-    res.json(res.locals.user);
-  } catch (error) {
-    next(error);
-  }
-};**/
 // - userPost - create new user. Remember to hash password
 const userPost = async (
   req: Request<{}, {}, UserInput>,
@@ -151,29 +131,34 @@ const userPost = async (
 };
 //userPutCurrent - update current user
 //checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
-
 const userPutCurrent = async (
   req: Request<{}, {}, Partial<UserInput>>,
-  res: Response<UpdateMessageResponse<Partial<UserInput>>>,
+  res: Response<PostMessageUser>,
   next: NextFunction
 ) => {
   try {
-    const updatedUser = await UserModel.findByIdAndUpdate(
+    // Update the user based on the user information available in res.locals.user
+    const user = await UserModel.findByIdAndUpdate(
       res.locals.user._id,
       req.body,
       {new: true}
     );
 
-    if (!updatedUser) {
+    if (!user) {
       throw new CustomError('User not found', 404);
     }
 
-    const response: UpdateMessageResponse<Partial<UserInput>> = {
-      message: 'OK',
-      data: req.body,
+    // Construct the data object with _id, user_name, and email
+    const data = {
+      _id: user._id,
+      user_name: user.user_name,
+      email: user.email,
     };
 
-    res.json(response);
+    res.status(200).json({
+      message: 'User updated',
+      data: data,
+    });
   } catch (error) {
     next(error);
   }

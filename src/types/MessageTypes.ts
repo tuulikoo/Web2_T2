@@ -23,6 +23,8 @@ type PostMessage = MessageResponse & {
   _id: number;
 };
 
+type UpdateMessageResponse<T> = MessageResponse & {data?: T};
+
 export {
   MessageResponse,
   ErrorResponse,
@@ -30,4 +32,5 @@ export {
   UploadResponse,
   PostMessage,
   PostMessageUser,
+  UpdateMessageResponse,
 };

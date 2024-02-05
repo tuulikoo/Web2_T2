@@ -81,6 +81,7 @@ const makeThumbnail = async (
   next: NextFunction
 ) => {
   try {
+    console.log('req.file?.path', req.file?.path);
     await sharp(req.file?.path)
       .resize(160, 160)
       .png()
@@ -98,18 +99,14 @@ const authenticate = async (
 ) => {
   try {
     const bearer = req.headers.authorization;
-    console.log('Authorization Header:', bearer);
     if (!bearer) {
-      console.log('No token provided');
       next(new CustomError('No token provided', 401));
       return;
     }
 
     const token = bearer.split(' ')[1];
-    console.log('Extracted Token:', token);
 
     if (!token) {
-      console.log('Nooo token provided');
       next(new CustomError('No token provided', 401));
       return;
     }
@@ -132,9 +129,8 @@ const authenticate = async (
 
     next();
   } catch (error) {
-    console.error('Authenticationnn Error:', (error as Error).message);
     next(new CustomError((error as Error).message, 400));
   }
 };
 
-export {notFound, errorHandler, getCoordinates, makeThumbnail, authenticate};
+export {notFound, errorHandler, getCoordinates, authenticate, makeThumbnail};

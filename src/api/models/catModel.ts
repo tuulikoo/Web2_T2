@@ -27,8 +27,8 @@ const catSchema = new mongoose.Schema<Cat>({
     required: true,
   },
   filename: {
+    //imagepath
     type: String,
-    required: true,
   },
   birthdate: {
     type: Date,

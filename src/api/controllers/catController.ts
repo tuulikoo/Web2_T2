@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from 'express';
-import {Cat} from '../../types/DBTypes';
+import {Cat, LoginUser} from '../../types/DBTypes';
 import CatModel from '../models/catModel';
 import CustomError from '../../classes/CustomError';
 import {MessageResponse, PostMessage} from '../../types/MessageTypes';
@@ -58,18 +58,44 @@ const catGetByUser = async (
   }
 };
 
+/**
+ *
+Create a postCat function that sends a POST request to /api/v1/cats/ with the following parameters:
+- token: string - user token
+- pic: string - path to the cat picture file
+The function should return a Promise that resolves to a MessageResponse & {data: Cat} object.
+ */
 const catPost = async (
-  req: Request<{}, {}, Omit<Cat, '_id'>>,
-  res: Response<PostMessage>,
+  req: Request<{token: string; pic: string}, {}, Omit<Cat, '_id'>>,
+  res: Response<MessageResponse & {data: Cat}>,
   next: NextFunction
 ) => {
+  console.log('Uploaded File:', req.file);
+  console.log('Uploaded File Path:', req.file?.path);
+  req.body.filename = req.file?.path || '';
   try {
+    console.log('res.locals.user', res.locals.user);
+    if (!res.locals.user || !('_id' in res.locals.user)) {
+      throw new CustomError('Invalid user data', 400);
+    }
+
     req.body.location = {
       ...req.body.location,
       type: 'Point',
     };
-    const cats = await CatModel.create(req.body);
-    res.status(201).json({message: 'Cat created', _id: cats._id});
+
+    const cat = await CatModel.create({
+      ...req.body,
+      owner: res.locals.user._id,
+    });
+    console.log('cat', cat);
+    const response: MessageResponse & {data: Cat} = {
+      message: 'OK',
+      data: cat,
+    };
+    console.log('Response Body:', response);
+
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
