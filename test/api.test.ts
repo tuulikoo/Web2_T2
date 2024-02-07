@@ -1,4 +1,3 @@
-//api.test.ts
 import app from '../src/app';
 import {
   deleteUser,

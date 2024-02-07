@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from 'express';
 import {Cat, LoginUser} from '../../types/DBTypes';
 import CatModel from '../models/catModel';
 import CustomError from '../../classes/CustomError';
-import {MessageResponse, PostMessage} from '../../types/MessageTypes';
+import {MessageResponse} from '../../types/MessageTypes';
 // TODO: create following functions:
 // - catGetByUser - get all cats by current user id****
 // - catGetByBoundingBox - get all cats by bounding box coordinates (getJSON)
@@ -19,7 +19,10 @@ const catListGet = async (
   next: NextFunction
 ) => {
   try {
-    const cats = await CatModel.find();
+    const cats = await CatModel.find().select('-__v').populate({
+      path: 'owner',
+      select: '-__v -password -role',
+    });
     res.json(cats);
   } catch (error) {
     next(error);
@@ -32,7 +35,12 @@ const catGet = async (
   next: NextFunction
 ) => {
   try {
-    const cats = await CatModel.findById(req.params.id);
+    const cats = await CatModel.findById(req.params.id)
+      .select('-__v')
+      .populate({
+        path: 'owner',
+        select: '-__v -password -role',
+      });
     if (!cats) {
       throw new CustomError('Cat not found', 404);
     }
@@ -58,13 +66,6 @@ const catGetByUser = async (
   }
 };
 
-/**
- *
-Create a postCat function that sends a POST request to /api/v1/cats/ with the following parameters:
-- token: string - user token
-- pic: string - path to the cat picture file
-The function should return a Promise that resolves to a MessageResponse & {data: Cat} object.
- */
 const catPost = async (
   req: Request<{token: string; pic: string}, {}, Omit<Cat, '_id'>>,
   res: Response<MessageResponse & {data: Cat}>,
@@ -100,10 +101,9 @@ const catPost = async (
     next(error);
   }
 };
-
 const catPut = async (
   req: Request<{id: string}, {}, Omit<Cat, '_id'>>,
-  res: Response<PostMessage>,
+  res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   try {
@@ -120,7 +120,11 @@ const catPut = async (
     if (!cat) {
       throw new CustomError('Cat not found', 404);
     }
-    res.json({message: 'Cat updated', _id: cat._id});
+    const response: MessageResponse & {data: Cat} = {
+      message: 'OK',
+      data: cat,
+    };
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -128,7 +132,7 @@ const catPut = async (
 
 const catPutAdmin = async (
   req: Request<{id: string}, {}, Omit<Cat, '_id'>>,
-  res: Response<PostMessage>,
+  res: Response<MessageResponse>,
   next: NextFunction
 ) => {
   try {
@@ -152,11 +156,16 @@ const catPutAdmin = async (
       throw new CustomError('Cat not found', 404);
     }
 
-    res.json({message: 'Cat updated', _id: cat._id});
+    const response: MessageResponse & {data: Cat} = {
+      message: 'OK',
+      data: cat,
+    };
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
 };
+
 const catDelete = async (
   req: Request<{id: string}>,
   res: Response<MessageResponse>,
@@ -175,7 +184,12 @@ const catDelete = async (
       throw new CustomError('Cat not found', 404);
     }
 
-    res.json({message: 'Cat deleted'});
+    const response: MessageResponse & {data: Cat} = {
+      message: 'Cat deleted',
+      data: cat as unknown as Cat,
+    };
+    console.log('delete response', response);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -194,14 +208,16 @@ const catDeleteAdmin = async (
         403
       );
     }
-
     const cat = await CatModel.findByIdAndDelete(req.params.id);
-
     if (!cat) {
       throw new CustomError('Cat not found', 404);
     }
-
-    res.json({message: 'Cat deleted'});
+    const response: MessageResponse & {data: Cat} = {
+      message: 'Cat deleted',
+      data: cat as unknown as Cat,
+    };
+    console.log('delete response', response);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }

@@ -26,7 +26,6 @@ const fileFilter = (
   }
 };
 const upload = multer({dest: './uploads/', fileFilter});
-
 const router = express.Router();
 
 router
@@ -34,7 +33,7 @@ router
   .get(catListGet)
   .post(
     authenticate,
-    upload.single('filename'),
+    upload.single('cat'),
     makeThumbnail,
     getCoordinates,
     body('cat_name').notEmpty().escape(),

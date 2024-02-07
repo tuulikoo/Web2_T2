@@ -58,7 +58,7 @@ const postCat = (
       .post('/api/v1/cats/')
       .set('Content-type', 'form-data')
       .set('Authorization', 'Bearer ' + token)
-      .attach('filename', 'test/' + pic)
+      .attach('cat', 'test/' + pic)
       .field('cat_name', 'Test Cat ' + new Date().toLocaleDateString('fi-FI'))
       .field('birthdate', '2020-01-01')
       .field('weight', 13.3)

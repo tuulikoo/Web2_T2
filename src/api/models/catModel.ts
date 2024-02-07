@@ -1,16 +1,6 @@
 import mongoose from 'mongoose';
 import {Cat} from '../../types/DBTypes';
 
-// TODO: mongoose schema for cat
-/**type Cat = Partial<Document> & {
-  _id?: Types.ObjectId | string;
-  cat_name: string;
-  weight: number;
-  owner: Types.ObjectId | User;
-  filename: string;
-  birthdate: Date;
-  location: Point;
-}; */
 const catSchema = new mongoose.Schema<Cat>({
   cat_name: {
     type: String,
@@ -27,8 +17,8 @@ const catSchema = new mongoose.Schema<Cat>({
     required: true,
   },
   filename: {
-    //imagepath
     type: String,
+    required: true,
   },
   birthdate: {
     type: Date,
@@ -38,11 +28,9 @@ const catSchema = new mongoose.Schema<Cat>({
     type: {
       type: String,
       enum: ['Point'],
-      required: true,
     },
     coordinates: {
       type: [Number],
-      required: true,
     },
   },
 });

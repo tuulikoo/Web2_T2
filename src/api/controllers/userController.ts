@@ -65,7 +65,6 @@ const checkToken = async (
   }
 };
 
-// - checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
 const userListGet = async (
   _req: Request,
   res: Response<UserOutput[]>,
@@ -91,7 +90,6 @@ const userGet = async (
   next: NextFunction
 ) => {
   try {
-    console.log('tultiin userGetiin');
     const user = await UserModel.findById(req.params.id);
 
     if (!user) {
@@ -109,20 +107,6 @@ const userGet = async (
   }
 };
 
-//old userGet that functions with checkToken:
-/**const userGet = async (
-  req: Request<{id: string}>,
-  res: Response<UserOutput>,
-  next: NextFunction
-) => {
-  try {
-    // User information is already available in res.locals.user
-    res.json(res.locals.user);
-  } catch (error) {
-    next(error);
-  }
-};**/
-// - userPost - create new user. Remember to hash password
 const userPost = async (
   req: Request<{}, {}, UserInput>,
   res: Response<PostMessageUser>,
@@ -149,8 +133,6 @@ const userPost = async (
     next(error);
   }
 };
-//userPutCurrent - update current user
-//checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
 
 const userPutCurrent = async (
   req: Request<{}, {}, Partial<UserInput>>,
@@ -190,7 +172,15 @@ const userDeleteCurrent = async (
     if (!user || !res.locals.user._id) {
       throw new CustomError('User not found', 404);
     }
-    res.json({message: 'User deleted'});
+    const response: MessageResponse & {data: Partial<User>} = {
+      message: 'User deleted',
+      data: {
+        _id: res.locals.user._id,
+        user_name: res.locals.user.user_name,
+        email: res.locals.user.email,
+      },
+    };
+    res.json(response);
   } catch (error) {
     next(error);
   }
