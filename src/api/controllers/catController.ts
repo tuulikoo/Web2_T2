@@ -3,6 +3,7 @@ import {Cat, LoginUser} from '../../types/DBTypes';
 import CatModel from '../models/catModel';
 import CustomError from '../../classes/CustomError';
 import {MessageResponse} from '../../types/MessageTypes';
+import rectangleBounds from '../../utils/rectangleBounds';
 // TODO: create following functions:
 // - catGetByUser - get all cats by current user id****
 // - catGetByBoundingBox - get all cats by bounding box coordinates (getJSON)
@@ -71,19 +72,24 @@ const catPost = async (
   res: Response<MessageResponse & {data: Cat}>,
   next: NextFunction
 ) => {
-  console.log('Uploaded File:', req.file);
-  console.log('Uploaded File Path:', req.file?.path);
   req.body.filename = req.file?.path || '';
+
   try {
-    console.log('res.locals.user', res.locals.user);
     if (!res.locals.user || !('_id' in res.locals.user)) {
       throw new CustomError('Invalid user data', 400);
     }
 
-    req.body.location = {
-      ...req.body.location,
-      type: 'Point',
-    };
+    if (res.locals.coords) {
+      req.body.location = {
+        type: res.locals.coords.type,
+        coordinates: res.locals.coords.coordinates,
+      };
+    } else {
+      req.body.location = {
+        type: 'Point',
+        coordinates: [24, 61],
+      };
+    }
 
     const cat = await CatModel.create({
       ...req.body,
@@ -101,6 +107,7 @@ const catPost = async (
     next(error);
   }
 };
+
 const catPut = async (
   req: Request<{id: string}, {}, Omit<Cat, '_id'>>,
   res: Response<MessageResponse>,
@@ -230,21 +237,51 @@ const catGetByBoundingBox = async (
 ) => {
   try {
     const {minLat, maxLat, minLon, maxLon} = req.query;
+
+    // Validate that all required parameters are present and are numbers
+    if (
+      !minLat ||
+      !maxLat ||
+      !minLon ||
+      !maxLon ||
+      isNaN(Number(minLat)) ||
+      isNaN(Number(maxLat)) ||
+      isNaN(Number(minLon)) ||
+      isNaN(Number(maxLon))
+    ) {
+      throw new CustomError('Invalid or missing bounding box coordinates', 400);
+    }
+
+    // Use rectangleBounds function to create a GeoJSON Polygon
+    const boundingBox = rectangleBounds(
+      {
+        lat: Number(maxLat),
+        lng: Number(maxLon),
+      },
+      {
+        lat: Number(minLat),
+        lng: Number(minLon),
+      }
+    );
+
+    // Find cats within the bounding box
     const cats = await CatModel.find({
       location: {
         $geoWithin: {
-          $box: [
-            [Number(minLon), Number(minLat)],
-            [Number(maxLon), Number(maxLat)],
-          ],
+          $geometry: boundingBox,
         },
       },
     });
+
+    console.log('Bounding Box Query:', req.query);
+    console.log('Cats within Bounding Box:', cats);
+
     res.json(cats);
   } catch (error) {
     next(error);
   }
 };
+
 export {
   catDelete,
   catDeleteAdmin,

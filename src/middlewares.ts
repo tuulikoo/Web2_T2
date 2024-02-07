@@ -35,15 +35,30 @@ const errorHandler = (
   });
 };
 
-const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
+const getCoordinates = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const defaultPoint = {
     type: 'Point',
     coordinates: [24, 61],
   };
+
   try {
-    // TODO: Use node-exif to get longitude and latitude from imgFile
-    // coordinates below should be an array of GPS coordinates in decimal format: [longitude, latitude]
-    new ExifImage({image: req.file?.path}, (error, exifData) => {
+    const imagePath = req.file?.path;
+    console.log('exifImage - Image Path:', imagePath);
+
+    const exifData = await new Promise((resolve, reject) => {
+      new ExifImage({image: imagePath}, (error, data) => {
+        if (error) reject(error);
+        else resolve(data);
+      });
+    });
+
+    console.log('exifImage - Exif Data:', exifData);
+
+    new ExifImage({image: imagePath}, (error, exifData) => {
       if (error) {
         res.locals.coords = defaultPoint;
         next();
@@ -62,6 +77,7 @@ const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
             coordinates: [lon, lat],
           };
           res.locals.coords = coordinates;
+          console.log('exifImage - Coordinates:', coordinates);
           next();
         } catch (err) {
           res.locals.coords = defaultPoint;
@@ -70,6 +86,7 @@ const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
       }
     });
   } catch (error) {
+    console.error('exifImage - Error:', error);
     res.locals.coords = defaultPoint;
     next();
   }
@@ -133,4 +150,4 @@ const authenticate = async (
   }
 };
 
-export {notFound, errorHandler, getCoordinates, authenticate, makeThumbnail};
+export {notFound, errorHandler, getCoordinates, makeThumbnail, authenticate};

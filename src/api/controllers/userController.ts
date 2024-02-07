@@ -25,14 +25,8 @@ const checkToken = async (
   next: NextFunction
 ) => {
   try {
-    const bearer = req.headers.authorization;
-    console.log('Authorization Header:', bearer);
-    if (!bearer) {
-      console.log('No token provided');
-      throw new CustomError('No token provided', 401);
-    }
-    const token = bearer.split(' ')[1];
-    console.log('Extracted Token:', token);
+    const token = req.headers.authorization?.split(' ')[1];
+
     if (!token) {
       throw new CustomError('No token provided', 401);
     }
@@ -46,14 +40,11 @@ const checkToken = async (
       process.env.JWT_SECRET
     ) as Partial<UserOutput>;
 
-    // Ensure only necessary fields are included in the response
     const userOutput: UserOutput = {
       _id: decodedToken._id || '',
       user_name: decodedToken.user_name || '',
       email: decodedToken.email || '',
     };
-
-    console.log('Decoded Token:', userOutput);
 
     res.locals.user = userOutput;
     res.json(userOutput);
