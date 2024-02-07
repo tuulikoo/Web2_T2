@@ -78,7 +78,7 @@ const catPost = async (
     if (!res.locals.user || !('_id' in res.locals.user)) {
       throw new CustomError('Invalid user data', 400);
     }
-
+    //koordinaatit res.locals.coords tallennetaan requestiin
     if (res.locals.coords) {
       req.body.location = {
         type: res.locals.coords.type,

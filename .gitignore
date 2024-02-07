@@ -76,3 +76,12 @@ dist
 
 uploads/*
 !uploads/.gitkeep
+.DS_Store
+node_modules/
+dist/
+*.log
+*.env
+*.sqlite
+*.vscode/
+package-lock.json
+tsconfig.json
