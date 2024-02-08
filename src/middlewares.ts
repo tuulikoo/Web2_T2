@@ -35,27 +35,15 @@ const errorHandler = (
   });
 };
 
-const getCoordinates = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
   const defaultPoint = {
     type: 'Point',
     coordinates: [24, 61],
   };
-
   try {
-    const imagePath = req.file?.path;
-
-    const exifData = await new Promise((resolve, reject) => {
-      new ExifImage({image: imagePath}, (error, data) => {
-        if (error) reject(error);
-        else resolve(data);
-      });
-    });
-
-    new ExifImage({image: imagePath}, (error, exifData) => {
+    // TODO: Use node-exif to get longitude and latitude from imgFile
+    // coordinates below should be an array of GPS coordinates in decimal format: [longitude, latitude]
+    new ExifImage({image: req.file?.path}, (error, exifData) => {
       if (error) {
         res.locals.coords = defaultPoint;
         next();
@@ -82,7 +70,6 @@ const getCoordinates = async (
       }
     });
   } catch (error) {
-    console.error('exifImage - Error:', error);
     res.locals.coords = defaultPoint;
     next();
   }
