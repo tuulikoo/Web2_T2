@@ -47,7 +47,6 @@ const getCoordinates = async (
 
   try {
     const imagePath = req.file?.path;
-    console.log('exifImage - Image Path:', imagePath);
 
     const exifData = await new Promise((resolve, reject) => {
       new ExifImage({image: imagePath}, (error, data) => {
@@ -55,8 +54,6 @@ const getCoordinates = async (
         else resolve(data);
       });
     });
-
-    console.log('exifImage - Exif Data:', exifData);
 
     new ExifImage({image: imagePath}, (error, exifData) => {
       if (error) {
@@ -77,7 +74,6 @@ const getCoordinates = async (
             coordinates: [lon, lat],
           };
           res.locals.coords = coordinates;
-          console.log('exifImage - Coordinates:', coordinates);
           next();
         } catch (err) {
           res.locals.coords = defaultPoint;
@@ -98,7 +94,6 @@ const makeThumbnail = async (
   next: NextFunction
 ) => {
   try {
-    console.log('req.file?.path', req.file?.path);
     await sharp(req.file?.path)
       .resize(160, 160)
       .png()
