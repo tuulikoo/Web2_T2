@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from 'express';
-import {Cat, LoginUser} from '../../types/DBTypes';
+import {Cat} from '../../types/DBTypes';
 import CatModel from '../models/catModel';
 import CustomError from '../../classes/CustomError';
 import {MessageResponse} from '../../types/MessageTypes';
