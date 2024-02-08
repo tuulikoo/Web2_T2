@@ -83,5 +83,3 @@ dist/
 *.env
 *.sqlite
 *.vscode/
-package-lock.json
-tsconfig.json
