@@ -1,5 +1,9 @@
 # SSSF week 2 exercise. Submit to Oma
 
+## All tests passed
+![Image of test score](<Screenshot%2024-02-09%at%16.09.46.png>)
+
+
 Convert the REST API from last weeks assignment to use MongoDB and Mongoose
 
 ## Getting started
@@ -65,3 +69,5 @@ User:
 - login users email as username
 - create admin manually to user collection: admin@metropolia.fi, password: 1234
 - Always empty your cats after tests, so that you dont have user_ids that are not in users collection
+
+
