@@ -238,8 +238,8 @@ const catGetByBoundingBox = async (
       location: {
         $geoWithin: {
           $box: [
-            [Number(bottomLeft[0]), Number(bottomLeft[1])],
-            [Number(topRight[0]), Number(topRight[1])],
+            [Number(bottomLeft[1]), Number(bottomLeft[0])],
+            [Number(topRight[1]), Number(topRight[0])],
           ],
         },
       },
