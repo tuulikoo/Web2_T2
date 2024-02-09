@@ -17,42 +17,20 @@ import {
   UpdateMessageResponse,
 } from '../../types/MessageTypes';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
 const checkToken = async (
-  req: Request<{token: string}>,
+  req: Request,
   res: Response<UserOutput>,
   next: NextFunction
 ) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-      throw new CustomError('No token provided', 401);
+    if (!res.locals.user || !('_id' in res.locals.user)) {
+      throw new CustomError('User not found', 400);
     }
-
-    if (!process.env.JWT_SECRET) {
-      throw new CustomError('JWT secret not set', 500);
-    }
-
-    const decodedToken = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    ) as Partial<UserOutput>;
-
-    const userOutput: UserOutput = {
-      _id: decodedToken._id || '',
-      user_name: decodedToken.user_name || '',
-      email: decodedToken.email || '',
-    };
-
-    res.locals.user = userOutput;
-    res.json(userOutput);
-
-    next();
+    const {password, role, ...OutputUser} = res.locals.user;
+    res.json(OutputUser);
   } catch (error) {
-    console.error('Token Check Error:', (error as Error).message);
-    next(new CustomError((error as Error).message, 400));
+    next(error);
   }
 };
 
