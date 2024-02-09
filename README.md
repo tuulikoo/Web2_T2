@@ -2,9 +2,6 @@
 
 Convert the REST API from last weeks assignment to use MongoDB and Mongoose
 
-## All tests passed
-![Image of test score](Screenshot%2024-02-09%at%16.09.46.png)
-
 ## Getting started
 
 - Clone this repo
@@ -70,3 +67,4 @@ User:
 - Always empty your cats after tests, so that you dont have user_ids that are not in users collection
 
 
+![Image of testrun results](<Screenshot 2024-02-09 at 16.09.46.png>)
