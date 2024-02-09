@@ -1,10 +1,9 @@
 # SSSF week 2 exercise. Submit to Oma
 
+Convert the REST API from last weeks assignment to use MongoDB and Mongoose
+
 ## All tests passed
 ![Image of test score](Screenshot%2024-02-09%at%16.09.46.png)
-
-
-Convert the REST API from last weeks assignment to use MongoDB and Mongoose
 
 ## Getting started
 
