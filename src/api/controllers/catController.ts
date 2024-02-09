@@ -4,16 +4,6 @@ import CatModel from '../models/catModel';
 import CustomError from '../../classes/CustomError';
 import {MessageResponse} from '../../types/MessageTypes';
 
-// TODO: create following functions:
-// - catGetByUser - get all cats by current user id****
-// - catGetByBoundingBox - get all cats by bounding box coordinates (getJSON)
-// - catPutAdmin - only admin can change cat owner*****
-// - catDeleteAdmin - only admin can delete cat*****
-// - catDelete - only owner can delete cat*****
-// - catPut - only owner can update cat*****
-// - catGet - get cat by id**********
-// - catListGet - get all cats******
-// - catPost - create new cat********
 const catListGet = async (
   _req: Request,
   res: Response<Cat[]>,
@@ -243,7 +233,12 @@ const catGetByBoundingBox = async (
           ],
         },
       },
-    });
+    })
+      .select('-__v')
+      .populate({
+        path: 'owner',
+        select: '-__v -password -role',
+      });
     console.log('Bbox cats', cats);
     res.json(cats);
   } catch (error) {

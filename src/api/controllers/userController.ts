@@ -1,12 +1,3 @@
-//userController
-// TODO: create the following functions:
-// - userGet - get user by id
-// - userListGet - get all users
-// - userPost - create new user. Remember to hash password
-// - userPutCurrent - update current user
-// - userDeleteCurrent - delete current user
-// - checkToken - check if current user token is valid: return data from res.locals.user as UserOutput. No need for database query
-
 import {Request, Response, NextFunction} from 'express';
 import {User, UserInput, UserOutput} from '../../types/DBTypes';
 import UserModel from '../models/userModel';
@@ -17,6 +8,7 @@ import {
   UpdateMessageResponse,
 } from '../../types/MessageTypes';
 import bcrypt from 'bcryptjs';
+import CatModel from '../models/catModel';
 
 const checkToken = async (
   req: Request,
@@ -82,7 +74,6 @@ const userPost = async (
   next: NextFunction
 ) => {
   try {
-    // hash the password with bcrypt before saving it to the user
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(req.body.password, saltRounds);
     const user = await UserModel.create({
@@ -141,6 +132,7 @@ const userDeleteCurrent = async (
     if (!user || !res.locals.user._id) {
       throw new CustomError('User not found', 404);
     }
+    await CatModel.deleteMany({owner: res.locals.user._id});
     const response: MessageResponse & {data: Partial<User>} = {
       message: 'User deleted',
       data: {
